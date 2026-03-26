@@ -33,4 +33,4 @@ Thumbs.db
 .idea/
 
 # Kiro specs (optional — remove this line if you want to track specs)
-# .kiro/
+.kiro

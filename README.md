@@ -34,8 +34,7 @@ CodeForge DSA/
 │       ├── pages/         # ProblemList, Workspace
 │       └── utils/         # API helpers
 ├── backend/           # Express API server
-│   ├── routes/            # /api/run, /api/submit, /api/problems
-│   └── temp/              # Temp files for code execution (gitignored)
+│   └── routes/            # /api/run, /api/submit, /api/problems
 └── data/
     └── problems/          # Problem definitions (JSON)
 ```
@@ -45,7 +44,7 @@ CodeForge DSA/
 ### Prerequisites
 
 - Node.js 18+
-- C++ compiler (g++), Python 3, Java JDK — for local code execution
+- Docker and Docker Compose — for running the Judge0 code execution service
 
 ### Installation
 
@@ -58,6 +57,17 @@ cd frontend && npm install
 ```
 
 ### Running Locally
+
+**Judge0 Code Execution** (port 2358):
+```bash
+# Start the Judge0 stack (Judge0 server, worker, Redis, Postgres)
+docker compose up -d
+
+# Stop the stack
+docker compose down
+```
+
+Judge0 will be accessible at `http://localhost:2358`.
 
 **Backend** (port 3000):
 ```bash
@@ -79,7 +89,7 @@ cd frontend && npm test
 
 ## Roadmap
 
-- [ ] Judge0 integration — real sandboxed compiler execution (GCC, CPython, OpenJDK, Node.js)
+- [x] Judge0 integration — real sandboxed compiler execution (GCC, CPython, OpenJDK, Node.js)
 - [ ] User authentication
 - [ ] DSA progress tracker with heatmap and topic breakdown
 - [ ] AI-powered hints and complexity analysis

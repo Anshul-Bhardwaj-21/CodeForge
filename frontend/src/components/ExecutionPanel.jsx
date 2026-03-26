@@ -13,7 +13,8 @@ export default function ExecutionPanel({
   submitResult,
   setSubmitResult,
   isLoading,
-  setIsLoading
+  setIsLoading,
+  onSubmitComplete,
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -36,11 +37,21 @@ export default function ExecutionPanel({
     setIsLoading(true);
     setOutputData(null); 
     setSubmitResult(null);
+    const startTime = Date.now();
     try {
       const result = await submitCode(problemId, language, code);
-      setSubmitResult(result);
+      const timeTaken = Date.now() - startTime;
+      if (onSubmitComplete) {
+        onSubmitComplete(result, timeTaken);
+      } else {
+        setSubmitResult(result);
+      }
     } catch (err) {
-      setSubmitResult({ error: 'Failed to submit to server.' });
+      if (onSubmitComplete) {
+        onSubmitComplete({ error: 'Failed to submit to server.' }, null);
+      } else {
+        setSubmitResult({ error: 'Failed to submit to server.' });
+      }
     } finally {
       setIsLoading(false);
     }

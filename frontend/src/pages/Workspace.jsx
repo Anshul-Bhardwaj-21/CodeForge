@@ -3,8 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import ProblemPanel from '../components/ProblemPanel';
 import EditorPanel from '../components/EditorPanel';
 import ExecutionPanel from '../components/ExecutionPanel';
-import { getProblemDetails } from '../utils/api';
-import { Terminal, ChevronLeft } from 'lucide-react';
+import { getProblemDetails, recordSubmission } from '../utils/api';
+import { Terminal, ChevronLeft, X } from 'lucide-react';
 
 export default function Workspace() {
   const { id } = useParams();
@@ -19,6 +19,7 @@ export default function Workspace() {
   const [outputData, setOutputData] = useState(null); 
   const [submitResult, setSubmitResult] = useState(null); 
   const [isLoading, setIsLoading] = useState(false);
+  const [progressWarning, setProgressWarning] = useState(null);
 
   useEffect(() => {
     localStorage.setItem('cf_last_problem', id);
@@ -41,6 +42,31 @@ export default function Workspace() {
     localStorage.setItem(`cf_code_${language}_${id}`, newCode);
   }
 
+  const onSubmitComplete = async (result, timeTaken) => {
+    setSubmitResult(result);
+
+    // Skip recording on network/server errors
+    if (result.error) return;
+
+    // Determine verdict
+    let verdict;
+    if (result.passed === result.total) {
+      verdict = 'accepted';
+    } else if (result.details?.some((d) => d.status === 'error')) {
+      verdict = 'runtime_error';
+    } else if (result.details?.some((d) => d.status === 'time_limit_exceeded')) {
+      verdict = 'time_limit_exceeded';
+    } else {
+      verdict = 'wrong_answer';
+    }
+
+    try {
+      await recordSubmission({ problemId: id, language, verdict, timeTaken });
+    } catch (err) {
+      setProgressWarning('Could not save submission progress. Your result is still shown below.');
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-[#0f172a] text-[#e5e7eb] font-sans justify-stretch">
       {/* Navbar */}
@@ -57,7 +83,24 @@ export default function Workspace() {
           <ChevronLeft className="w-4 h-4 mr-1" />
           Problem List
         </Link>
+        <Link to="/profile" className="flex items-center text-sm font-semibold text-[#9ca3af] hover:text-[#e5e7eb] transition-colors bg-[#1f2937]/50 hover:bg-[#1f2937] px-4 py-2 rounded-lg border border-[#334155]">
+          Profile
+        </Link>
       </header>
+
+      {/* Progress Warning Banner */}
+      {progressWarning && (
+        <div className="flex items-center justify-between px-6 py-2 bg-[#78350f] border-b border-[#92400e] text-[#fde68a] text-sm shrink-0">
+          <span>{progressWarning}</span>
+          <button
+            onClick={() => setProgressWarning(null)}
+            className="ml-4 text-[#fde68a] hover:text-white transition-colors"
+            aria-label="Dismiss warning"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Main Workspace */}
       <main className="flex flex-1 overflow-hidden p-4 gap-4">
@@ -90,6 +133,7 @@ export default function Workspace() {
             setSubmitResult={setSubmitResult}
             isLoading={isLoading}
             setIsLoading={setIsLoading}
+            onSubmitComplete={onSubmitComplete}
           />
         </div>
       </main>

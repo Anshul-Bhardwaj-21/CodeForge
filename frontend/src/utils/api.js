@@ -31,3 +31,26 @@ export const submitCode = async (problemId, language, code) => {
   if (!res.ok) throw new Error('Submission failed');
   return res.json();
 };
+
+export const getProgress = async () => {
+  const res = await fetch(`${API_BASE}/progress`);
+  if (!res.ok) throw new Error('Failed to fetch progress');
+  return res.json();
+};
+
+export const getProgressForProblem = async (id) => {
+  const res = await fetch(`${API_BASE}/progress/${id}`);
+  if (!res.ok) throw new Error('Failed to fetch progress for problem');
+  return res.json();
+};
+
+export const recordSubmission = async (payload) => {
+  const { problemId, language, verdict, timeTaken } = payload;
+  const res = await fetch(`${API_BASE}/progress/submissions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ problemId, language, verdict, timeTaken })
+  });
+  if (!res.ok) throw new Error('Failed to record submission');
+  return res.json();
+};
