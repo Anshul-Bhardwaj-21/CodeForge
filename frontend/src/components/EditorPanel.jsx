@@ -3,6 +3,12 @@ import Editor from '@monaco-editor/react';
 import { RotateCcw } from 'lucide-react';
 
 const boilerplates = {
+  c: `#include <stdio.h>
+
+int main() {
+    // your code here
+    return 0;
+}`,
   cpp: `#include <bits/stdc++.h>
 using namespace std;
 
@@ -64,6 +70,7 @@ export default function EditorPanel({ language, setLanguage, code, setCode }) {
             value={language}
             onChange={handleLanguageChange}
           >
+            <option value="c">C</option>
             <option value="cpp">C++</option>
             <option value="python">Python</option>
             <option value="java">Java</option>
@@ -85,7 +92,7 @@ export default function EditorPanel({ language, setLanguage, code, setCode }) {
       <div className="flex-1 overflow-hidden relative">
         <Editor
           height="100%"
-          language={language === 'cpp' ? 'cpp' : language}
+          language={language}
           theme="vs-dark"
           value={code}
           onChange={handleEditorChange}

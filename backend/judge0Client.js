@@ -3,6 +3,7 @@
 const JUDGE0_URL = process.env.JUDGE0_URL || 'http://localhost:2358';
 
 const LANGUAGE_IDS = {
+  c:          50,
   cpp:        54,
   python:     71,
   java:       62,

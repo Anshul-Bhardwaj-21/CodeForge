@@ -14,8 +14,11 @@ router.get('/', (req, res) => {
     const problems = [];
     
     files.forEach(file => {
-      if (file.endsWith('.json')) {
-        const content = JSON.parse(fs.readFileSync(path.join(PROBLEMS_DIR, file), 'utf8'));
+      if (!file.endsWith('.json')) return;
+      try {
+        const raw = fs.readFileSync(path.join(PROBLEMS_DIR, file), 'utf8').trim();
+        if (!raw) return; // skip empty files
+        const content = JSON.parse(raw);
         problems.push({
           id: content.id,
           title: content.title,
@@ -23,8 +26,12 @@ router.get('/', (req, res) => {
           tags: content.tags,
           description: content.description
         });
+      } catch (e) {
+        console.warn(`Skipping malformed problem file: ${file}`);
       }
     });
+
+    problems.sort((a, b) => a.id - b.id);
 
     res.json(problems);
   } catch (err) {

@@ -1,0 +1,29 @@
+{
+  "id": 2,
+  "title": "Highest Engagement Score",
+  "difficulty": "Easy",
+  "tags": ["Array"],
+  "description": "Find the maximum value from the given array of user engagement scores.",
+  "constraints": "- 1 <= n <= 10^5\n- -10^9 <= arr[i] <= 10^9",
+  "examples": [
+    {
+      "input": "6\n3 9 1 7 5 11",
+      "output": "11",
+      "explanation": "Maximum element is 11."
+    }
+  ],
+  "test_cases": {
+    "sample_test_cases": [
+      {
+        "input": "6\n3 9 1 7 5 11",
+        "output": "11"
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "input": "4\n-1 -5 -3 -4",
+        "output": "-1"
+      }
+    ]
+  }
+}

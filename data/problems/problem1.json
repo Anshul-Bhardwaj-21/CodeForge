@@ -1,0 +1,29 @@
+{
+  "id": 1,
+  "title": "Activity Log Printer",
+  "difficulty": "Easy",
+  "tags": ["Array", "Traversal"],
+  "description": "A system stores user activity scores in an array. Print all scores in the same order.",
+  "constraints": "- 1 <= n <= 10^5\n- -10^9 <= arr[i] <= 10^9",
+  "examples": [
+    {
+      "input": "5\n10 20 30 40 50",
+      "output": "10 20 30 40 50",
+      "explanation": "Print all elements in same order."
+    }
+  ],
+  "test_cases": {
+    "sample_test_cases": [
+      {
+        "input": "5\n10 20 30 40 50",
+        "output": "10 20 30 40 50"
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "input": "3\n1 2 3",
+        "output": "1 2 3"
+      }
+    ]
+  }
+}

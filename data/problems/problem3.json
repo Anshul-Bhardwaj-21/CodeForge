@@ -1,0 +1,29 @@
+{
+  "id": 3,
+  "title": "Even User Counter",
+  "difficulty": "Easy",
+  "tags": ["Array", "Counting"],
+  "description": "Count how many elements in the array are even numbers.",
+  "constraints": "- 1 <= n <= 10^5\n- -10^9 <= arr[i] <= 10^9",
+  "examples": [
+    {
+      "input": "5\n1 2 3 4 6",
+      "output": "3",
+      "explanation": "Even numbers are 2, 4, 6."
+    }
+  ],
+  "test_cases": {
+    "sample_test_cases": [
+      {
+        "input": "5\n1 2 3 4 6",
+        "output": "3"
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "input": "4\n1 3 5 7",
+        "output": "0"
+      }
+    ]
+  }
+}

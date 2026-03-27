@@ -1,0 +1,37 @@
+{
+  "id": 4,
+  "title": "Sum of Array",
+  "difficulty": "Easy",
+  "tags": ["Array", "Math"],
+  "description": "Given an array of integers, return the sum of all elements.",
+  "constraints": "- 1 <= n <= 10^5\n- -10^9 <= arr[i] <= 10^9",
+  "examples": [
+    {
+      "input": "5\n1 2 3 4 5",
+      "output": "15",
+      "explanation": "1 + 2 + 3 + 4 + 5 = 15."
+    }
+  ],
+  "test_cases": {
+    "sample_test_cases": [
+      {
+        "input": "5\n1 2 3 4 5",
+        "output": "15"
+      },
+      {
+        "input": "3\n10 20 30",
+        "output": "60"
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "input": "1\n0",
+        "output": "0"
+      },
+      {
+        "input": "4\n-1 -2 3 4",
+        "output": "4"
+      }
+    ]
+  }
+}
