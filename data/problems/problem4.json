@@ -12,6 +12,12 @@
       "explanation": "1 + 2 + 3 + 4 + 5 = 15."
     }
   ],
+  "boilerplates": {
+    "c": "#include <stdio.h>\n\nint main() {\n    int n;\n    scanf(\"%d\", &n);\n    long long sum = 0;\n    for (int i = 0; i < n; i++) {\n        int x; scanf(\"%d\", &x);\n        sum += x;\n    }\n    printf(\"%lld\\n\", sum);\n    return 0;\n}",
+    "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    long long sum = 0;\n    for (int i = 0; i < n; i++) {\n        int x; cin >> x;\n        sum += x;\n    }\n    cout << sum << endl;\n    return 0;\n}",
+    "python": "if __name__ == \"__main__\":\n    n = int(input())\n    arr = list(map(int, input().split()))\n    print(sum(arr))",
+    "java": "import java.util.*;\n\nclass Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        long sum = 0;\n        for (int i = 0; i < n; i++) sum += sc.nextInt();\n        System.out.println(sum);\n    }\n}"
+  },
   "test_cases": {
     "sample_test_cases": [
       {

@@ -39,16 +39,17 @@ class Main {
 }`
 };
 
-export default function EditorPanel({ language, setLanguage, code, setCode }) {
+export default function EditorPanel({ language, setLanguage, code, setCode, problemBoilerplates }) {
   useEffect(() => {
     localStorage.setItem('cf_language', language);
     const savedCode = localStorage.getItem(`cf_code_${language}`);
     if (savedCode !== null && savedCode !== "") {
       setCode(savedCode);
     } else {
-      setCode(boilerplates[language]);
+      // Prefer problem-specific boilerplate, fall back to generic
+      setCode((problemBoilerplates?.[language]) ?? boilerplates[language] ?? '');
     }
-  }, [language, setCode]);
+  }, [language, setCode, problemBoilerplates]);
 
   const handleLanguageChange = (e) => {
     setLanguage(e.target.value);
@@ -78,8 +79,9 @@ export default function EditorPanel({ language, setLanguage, code, setCode }) {
         </div>
         <button 
           onClick={() => {
-            setCode(boilerplates[language]);
-            localStorage.setItem(`cf_code_${language}`, boilerplates[language]);
+            const bp = (problemBoilerplates?.[language]) ?? boilerplates[language] ?? '';
+            setCode(bp);
+            localStorage.setItem(`cf_code_${language}`, bp);
           }}
           className="flex items-center text-xs font-medium text-[#9ca3af] hover:text-[#e5e7eb] transition-colors px-3 py-1.5 rounded bg-transparent hover:bg-[#1f2937]"
           title="Reset to boilerplate code"

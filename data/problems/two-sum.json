@@ -17,6 +17,12 @@
       "explanation": "Because nums[1] + nums[2] == 6, we return 1 2."
     }
   ],
+  "boilerplates": {
+    "c": "#include <stdio.h>\n\nint* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    // your code here\n    *returnSize = 2;\n    int* result = (int*)malloc(2 * sizeof(int));\n    return result;\n}\n\nint main() {\n    int n, target;\n    scanf(\"%d\", &n);\n    int nums[n];\n    for (int i = 0; i < n; i++) scanf(\"%d\", &nums[i]);\n    scanf(\"%d\", &target);\n    int returnSize;\n    int* ans = twoSum(nums, n, target, &returnSize);\n    printf(\"%d %d\\n\", ans[0], ans[1]);\n    return 0;\n}",
+    "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nvector<int> twoSum(vector<int>& nums, int target) {\n    // your code here\n    return {};\n}\n\nint main() {\n    int n, target;\n    cin >> n;\n    vector<int> nums(n);\n    for (int& x : nums) cin >> x;\n    cin >> target;\n    auto ans = twoSum(nums, target);\n    cout << ans[0] << \" \" << ans[1] << endl;\n    return 0;\n}",
+    "python": "def two_sum(nums, target):\n    # your code here\n    pass\n\nif __name__ == \"__main__\":\n    n = int(input())\n    nums = list(map(int, input().split()))\n    target = int(input())\n    ans = two_sum(nums, target)\n    print(*ans)",
+    "java": "import java.util.*;\n\nclass Main {\n    public static int[] twoSum(int[] nums, int target) {\n        // your code here\n        return new int[]{};\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        int[] ans = twoSum(nums, target);\n        System.out.println(ans[0] + \" \" + ans[1]);\n    }\n}"
+  },
   "test_cases": {
     "sample_test_cases": [
       {

@@ -12,6 +12,15 @@
       "explanation": "Even numbers are 2, 4, 6."
     }
   ],
+  "boilerplates": {
+    "c": "#include <stdio.h>\n#include <stdlib.h>\n\nint solve(int n, int* arr) {\n    // WRITE YOUR CODE HERE\n}\n\nint main() {\n    int n;\n    scanf(\"%d\", &n);\n    int* arr = (int*)malloc(n * sizeof(int));\n    for(int i = 0; i < n; i++) scanf(\"%d\", &arr[i]);\n    printf(\"%d\", solve(n, arr));\n    return 0;\n}",
+    
+    "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint solve(int n, vector<int>& arr) {\n    // WRITE YOUR CODE HERE\n}\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> arr(n);\n    for(int i = 0; i < n; i++) cin >> arr[i];\n    cout << solve(n, arr);\n    return 0;\n}",
+    
+    "python": "def solve(n, arr):\n    # WRITE YOUR CODE HERE\n    pass\n\nif __name__ == \"__main__\":\n    n = int(input())\n    arr = list(map(int, input().split()))\n    print(solve(n, arr))",
+    
+    "java": "import java.util.*;\n\nclass Main {\n    static int solve(int n, int[] arr) {\n        // WRITE YOUR CODE HERE\n        return 0;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] arr = new int[n];\n        for(int i = 0; i < n; i++) arr[i] = sc.nextInt();\n        System.out.println(solve(n, arr));\n    }\n}"
+  },
   "test_cases": {
     "sample_test_cases": [
       {

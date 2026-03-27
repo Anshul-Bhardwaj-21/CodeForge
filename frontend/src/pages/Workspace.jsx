@@ -115,7 +115,8 @@ export default function Workspace() {
             language={language} 
             setLanguage={setLanguage} 
             code={code} 
-            setCode={handleSetCode} 
+            setCode={handleSetCode}
+            problemBoilerplates={problem?.boilerplates}
           />
         </div>
 
