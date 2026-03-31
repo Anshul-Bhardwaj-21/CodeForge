@@ -12,6 +12,41 @@ export const getProblemDetails = async (id) => {
   return res.json();
 };
 
+/**
+ * Open an SSE connection to /api/run-stream.
+ * Calls onEvent(payload) for each server-sent event.
+ * Returns a cleanup function that aborts the connection.
+ */
+export const runCodeStream = (language, code, input, onEvent) => {
+  const params = new URLSearchParams({
+    language,
+    code,
+    input: input || '',
+  });
+
+  const url = `${API_BASE}/run-stream?${params.toString()}`;
+  const es = new EventSource(url);
+
+  es.onmessage = (e) => {
+    try {
+      const payload = JSON.parse(e.data);
+      onEvent(payload);
+      // Close the connection once execution is terminal
+      if (payload.stage === 'completed' || payload.stage === 'error') {
+        es.close();
+      }
+    } catch (_) {}
+  };
+
+  es.onerror = () => {
+    onEvent({ stage: 'error', error: 'Connection to execution server lost.', status: 'error' });
+    es.close();
+  };
+
+  // Return cleanup so callers can abort early (e.g. component unmount)
+  return () => es.close();
+};
+
 export const runCode = async (language, code, input) => {
   const res = await fetch(`${API_BASE}/run`, {
     method: 'POST',
