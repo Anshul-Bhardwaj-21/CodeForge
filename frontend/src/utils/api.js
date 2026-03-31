@@ -126,3 +126,16 @@ export const replaySubmission = async (submissionId) => {
   }
   return res.json();
 };
+
+export const explainError = async ({ language, code, error, input }) => {
+  const res = await fetch(`${API_BASE}/explain-error`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ language, code, error, input }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Explain failed: ${res.status}`);
+  }
+  return res.json();
+};

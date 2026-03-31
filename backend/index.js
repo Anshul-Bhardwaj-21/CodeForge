@@ -8,6 +8,7 @@ const problemsRoute = require('./routes/problems');
 const progressRoute = require('./routes/progress');
 const { router: submissionsRoute } = require('./routes/submissions');
 const { executionLimiter } = require('./rateLimiter');
+const explainErrorRoute = require('./routes/explainError');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +22,7 @@ app.use('/api/submit', executionLimiter, submitRoute);
 app.use('/api/problems', problemsRoute);
 app.use('/api/progress', progressRoute);
 app.use('/api/submissions', submissionsRoute);
+app.use('/api/explain-error', explainErrorRoute);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
