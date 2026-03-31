@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 const executeRoute = require('./routes/execute');
+const executeStreamRoute = require('./routes/executeStream');
 const submitRoute = require('./routes/submit');
 const problemsRoute = require('./routes/problems');
 const progressRoute = require('./routes/progress');
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/run', executeRoute);
+app.use('/api/run-stream', executeStreamRoute);
 app.use('/api/submit', submitRoute);
 app.use('/api/problems', problemsRoute);
 app.use('/api/progress', progressRoute);

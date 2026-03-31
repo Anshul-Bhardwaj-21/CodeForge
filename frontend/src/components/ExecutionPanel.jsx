@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { runCode, submitCode } from '../utils/api';
+import React, { useState, useRef } from 'react';
+import { runCodeStream, submitCode } from '../utils/api';
 import { Play, Send, Loader2, CheckCircle2, XCircle, AlertTriangle, Copy, Check, Zap, MemoryStick } from 'lucide-react';
 
 // ── Performance bar chart ─────────────────────────────────────────────────────
@@ -208,23 +208,49 @@ export default function ExecutionPanel({
   const [copied, setCopied] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [streamStatus, setStreamStatus] = useState(null); // 'queued' | 'running' | null
+  const cleanupStreamRef = useRef(null);
 
   const busy = isRunning || isSubmitting;
 
-  const handleRun = async () => {
+  const handleRun = () => {
+    // Abort any in-flight stream
+    if (cleanupStreamRef.current) {
+      cleanupStreamRef.current();
+      cleanupStreamRef.current = null;
+    }
+
     setIsRunning(true);
     setIsLoading(true);
     setSubmitResult(null);
     setOutputData(null);
-    try {
-      const result = await runCode(language, code, customInput);
-      setOutputData(result);
-    } catch (err) {
-      setOutputData({ error: 'Failed to connect to execution server.', status: 'error' });
-    } finally {
-      setIsRunning(false);
-      setIsLoading(false);
-    }
+    setStreamStatus('queued');
+
+    const cleanup = runCodeStream(language, code, customInput, (payload) => {
+      if (payload.stage === 'submitting') {
+        setStreamStatus('queued');
+      } else if (payload.stage === 'running') {
+        setStreamStatus(payload.status === 'queued' ? 'queued' : 'running');
+      } else if (payload.stage === 'completed') {
+        setStreamStatus(null);
+        setOutputData({
+          output: payload.output,
+          error: payload.error,
+          status: payload.status,
+        });
+        setIsRunning(false);
+        setIsLoading(false);
+        cleanupStreamRef.current = null;
+      } else if (payload.stage === 'error') {
+        setStreamStatus(null);
+        setOutputData({ error: payload.error || 'Execution failed.', status: 'error' });
+        setIsRunning(false);
+        setIsLoading(false);
+        cleanupStreamRef.current = null;
+      }
+    });
+
+    cleanupStreamRef.current = cleanup;
   };
 
   const handleSubmit = async () => {
@@ -324,8 +350,17 @@ export default function ExecutionPanel({
               <div className="h-full flex flex-col items-center justify-center text-[#3b82f6] gap-3">
                 <Loader2 className="w-8 h-8 animate-spin" />
                 <span className="font-sans font-medium">
-                  {isSubmitting ? 'Submitting...' : 'Executing on server...'}
+                  {isSubmitting
+                    ? 'Submitting...'
+                    : streamStatus === 'queued'
+                    ? 'Queued — waiting for sandbox...'
+                    : 'Running on sandbox...'}
                 </span>
+                {isRunning && streamStatus && (
+                  <span className="text-xs text-[#4b5563] font-mono">
+                    {streamStatus === 'queued' ? '⏳ In queue' : '⚙️ Executing'}
+                  </span>
+                )}
               </div>
             )}
 
