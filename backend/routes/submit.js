@@ -7,6 +7,7 @@ const path = require('path');
 
 const { LANGUAGE_IDS, execute, normalize } = require('../judge0Client');
 const { estimateComplexity } = require('../complexityAnalyzer');
+const { getCached, setCached, isCacheable } = require('../cacheManager');
 
 const PROBLEMS_DIR = path.join(__dirname, '../../data/problems');
 
@@ -62,7 +63,17 @@ router.post('/', async (req, res) => {
       const testCase = allTestCases[i];
 
       try {
-        const result = await execute({ languageId, sourceCode: code, stdin: testCase.input });
+        // ── Per-test-case cache lookup ──────────────────────────────────────
+        let result = await getCached(languageId, code, testCase.input);
+        if (result) {
+          console.log(`[CACHE HIT]  submit problem=${problemId} tc=${i + 1}`);
+        } else {
+          console.log(`[CACHE MISS] submit problem=${problemId} tc=${i + 1}`);
+          result = await execute({ languageId, sourceCode: code, stdin: testCase.input });
+          if (isCacheable(result)) {
+            await setCached(languageId, code, testCase.input, result);
+          }
+        }
 
         const actualOutput = result.output;
         const expectedOutput = testCase.output;
