@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { runCodeStream, submitCode } from '../utils/api';
-import { Play, Send, Loader2, CheckCircle2, XCircle, AlertTriangle, Copy, Check, Zap, MemoryStick } from 'lucide-react';
+import { runCodeStream, submitCode, explainError } from '../utils/api';
+import { Play, Send, Loader2, CheckCircle2, XCircle, AlertTriangle, Copy, Check, Zap, Sparkles, X } from 'lucide-react';
 
 // ── Performance bar chart ─────────────────────────────────────────────────────
 const COMPLEXITY_CONFIG = {
@@ -190,6 +190,111 @@ function PerformanceChart({ performance }) {
   );
 }
 
+// ── AI Error Explanation Modal ────────────────────────────────────────────────
+
+function ExplainModal({ language, code, error, input, onClose }) {
+  const [loading, setLoading] = useState(true);
+  const [result, setResult] = useState(null);
+  const [fetchError, setFetchError] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  React.useEffect(() => {
+    explainError({ language, code, error, input })
+      .then(setResult)
+      .catch(e => setFetchError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const fullText = result
+    ? `${result.summary}\n\n${result.detailed}\n\nFix suggestions:\n${result.fix_suggestions.map((s, i) => `${i + 1}. ${s}`).join('\n')}`
+    : '';
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(fullText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="w-full max-w-2xl bg-[#0d1424] border border-[#1e2d45] rounded-2xl shadow-2xl flex flex-col max-h-[85vh]">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#1e2d45] shrink-0">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-violet-400" />
+            <span className="text-sm font-bold text-white">AI Error Explanation</span>
+            {result?.cached && <span className="text-[10px] px-1.5 py-0.5 bg-[#1e2d45] text-[#64748b] rounded border border-[#2a3f5f]">cached</span>}
+          </div>
+          <div className="flex items-center gap-2">
+            {result && (
+              <button onClick={handleCopy} className="text-[#64748b] hover:text-white transition-colors" title="Copy explanation">
+                {copied ? <Check className="w-4 h-4 text-[#22c55e]" /> : <Copy className="w-4 h-4" />}
+              </button>
+            )}
+            <button onClick={onClose} className="text-[#475569] hover:text-white transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-5">
+          {loading && (
+            <div className="flex flex-col items-center justify-center py-16 gap-3 text-violet-400">
+              <Loader2 className="w-7 h-7 animate-spin" />
+              <span className="text-sm font-medium">Analyzing your error...</span>
+            </div>
+          )}
+
+          {fetchError && (
+            <div className="flex items-center gap-2 bg-[#ef4444]/10 border border-[#ef4444]/25 text-[#ef4444] rounded-xl px-4 py-3 text-sm">
+              <AlertTriangle className="w-4 h-4 shrink-0" /> {fetchError}
+            </div>
+          )}
+
+          {result && !loading && (
+            <>
+              {/* Summary */}
+              <div className="bg-[#0a0f1e] border border-[#1e2d45] rounded-xl px-5 py-4">
+                <p className="text-[#e5e7eb] text-sm font-medium leading-relaxed">{result.summary}</p>
+              </div>
+
+              {/* Detailed */}
+              {result.detailed && (
+                <div>
+                  <span className="text-[10px] font-bold text-[#64748b] uppercase tracking-wider block mb-2">Explanation</span>
+                  <div className="bg-[#0a0f1e] border border-[#1e2d45] rounded-xl px-5 py-4">
+                    <p className="text-[#cbd5e1] text-sm leading-relaxed whitespace-pre-wrap">{result.detailed}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Fix suggestions */}
+              {result.fix_suggestions?.length > 0 && (
+                <div>
+                  <span className="text-[10px] font-bold text-[#64748b] uppercase tracking-wider block mb-2">How to Fix</span>
+                  <div className="space-y-2">
+                    {result.fix_suggestions.map((s, i) => (
+                      <div key={i} className="flex gap-3 bg-[#0a0f1e] border border-[#1e2d45] rounded-xl px-4 py-3">
+                        <span className="shrink-0 w-5 h-5 rounded-full bg-violet-500/20 text-violet-400 text-[11px] font-bold flex items-center justify-center border border-violet-500/30">{i + 1}</span>
+                        <p className="text-[#cbd5e1] text-sm leading-relaxed">{s}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {result.fallback && (
+                <p className="text-[11px] text-[#475569] text-center">AI service unavailable — showing generic guidance.</p>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 export default function ExecutionPanel({
   problemId,
@@ -208,8 +313,9 @@ export default function ExecutionPanel({
   const [copied, setCopied] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [streamStatus, setStreamStatus] = useState(null); // 'queued' | 'running' | null
+  const [streamStatus, setStreamStatus] = useState(null);
   const cleanupStreamRef = useRef(null);
+  const [explainModal, setExplainModal] = useState(null); // { error, input }
 
   const busy = isRunning || isSubmitting;
 
@@ -386,7 +492,15 @@ export default function ExecutionPanel({
                 )}
                 {outputData.error && (
                   <div>
-                    <span className="text-xs font-bold text-[#ef4444] block mb-2">Standard Error</span>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-[#ef4444]">Standard Error</span>
+                      <button
+                        onClick={() => setExplainModal({ error: outputData.error, input: customInput })}
+                        className="flex items-center gap-1 px-2 py-1 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/25 text-violet-400 text-[11px] font-semibold rounded-lg transition-all"
+                      >
+                        <Sparkles className="w-3 h-3" /> Explain Error
+                      </button>
+                    </div>
                     <div className="bg-[#ef4444]/10 px-4 py-3 rounded-lg border border-[#ef4444]/30 shadow-inner">
                       <pre className="text-[#f87171] whitespace-pre-wrap">{outputData.error}</pre>
                     </div>
@@ -479,6 +593,17 @@ export default function ExecutionPanel({
           <PerformanceChart performance={submitResult.performance} />
         )}
       </div>
+
+      {/* AI Explain Error Modal */}
+      {explainModal && (
+        <ExplainModal
+          language={language}
+          code={code}
+          error={explainModal.error}
+          input={explainModal.input}
+          onClose={() => setExplainModal(null)}
+        />
+      )}
     </div>
   );
 }
