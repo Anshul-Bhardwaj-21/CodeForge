@@ -10,21 +10,40 @@ router.get('/', (req, res) => {
     if (!fs.existsSync(PROBLEMS_DIR)) {
       return res.json([]);
     }
+
+    // Optional query filters: ?difficulty=Easy  ?tag=Array  (combinable)
+    const difficultyFilter = req.query.difficulty
+      ? req.query.difficulty.trim().toLowerCase()
+      : null;
+    const tagFilter = req.query.tag
+      ? req.query.tag.trim().toLowerCase()
+      : null;
+
     const files = fs.readdirSync(PROBLEMS_DIR);
     const problems = [];
-    
+
     files.forEach(file => {
       if (!file.endsWith('.json')) return;
       try {
         const raw = fs.readFileSync(path.join(PROBLEMS_DIR, file), 'utf8').trim();
-        if (!raw) return; // skip empty files
+        if (!raw) return;
         const content = JSON.parse(raw);
+
+        const tags = Array.isArray(content.tags) ? content.tags : [];
+        const difficulty = (content.difficulty || '').toLowerCase();
+
+        // Apply difficulty filter (case-insensitive)
+        if (difficultyFilter && difficulty !== difficultyFilter) return;
+
+        // Apply tag filter (case-insensitive, any tag match)
+        if (tagFilter && !tags.some(t => t.toLowerCase() === tagFilter)) return;
+
         problems.push({
-          id: content.id,
-          title: content.title,
-          difficulty: content.difficulty,
-          tags: content.tags,
-          description: content.description
+          id:         content.id,
+          title:      content.title,
+          difficulty: content.difficulty || null,
+          tags:       tags,
+          description: content.description,
         });
       } catch (e) {
         console.warn(`Skipping malformed problem file: ${file}`);
@@ -32,7 +51,6 @@ router.get('/', (req, res) => {
     });
 
     problems.sort((a, b) => a.id - b.id);
-
     res.json(problems);
   } catch (err) {
     res.status(500).json({ error: 'Failed to read problems' });
