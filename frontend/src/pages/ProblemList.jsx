@@ -11,23 +11,43 @@ const DIFFICULTY_CONFIG = {
 
 export default function ProblemList() {
   const [problems, setProblems] = useState([]);
+  const [allTags, setAllTags] = useState([]);
   const [progress, setProgress] = useState({});
   const [search, setSearch] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState('All');
+  const [tagFilter, setTagFilter] = useState('');
 
+  // Fetch all problems once to build the full tag list
   useEffect(() => {
-    getProblems().then(setProblems).catch(console.error);
+    getProblems().then(data => {
+      const tagSet = new Set();
+      data.forEach(p => (p.tags || []).forEach(t => tagSet.add(t)));
+      setAllTags([...tagSet].sort());
+    }).catch(console.error);
+
     getProgress()
       .then(data => setProgress(data.problems || {}))
-      .catch(() => {}); // non-critical
+      .catch(() => {});
   }, []);
 
+  // Re-fetch from backend whenever filters change
+  useEffect(() => {
+    getProblems({
+      difficulty: difficultyFilter !== 'All' ? difficultyFilter : undefined,
+      tag: tagFilter || undefined,
+    })
+      .then(setProblems)
+      .catch(console.error);
+  }, [difficultyFilter, tagFilter]);
+
+  // Client-side search on top of backend-filtered results
   const filtered = problems.filter(p => {
-    const matchSearch =
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      p.tags.some(t => t.toLowerCase().includes(search.toLowerCase()));
-    const matchDiff = difficultyFilter === 'All' || p.difficulty === difficultyFilter;
-    return matchSearch && matchDiff;
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return (
+      p.title.toLowerCase().includes(q) ||
+      (p.tags || []).some(t => t.toLowerCase().includes(q))
+    );
   });
 
   const counts = { Easy: 0, Medium: 0, Hard: 0 };
@@ -83,7 +103,7 @@ export default function ProblemList() {
         </div>
 
         {/* ── Filter bar ── */}
-        <div className="flex gap-3 mb-5">
+        <div className="flex gap-3 mb-5 flex-wrap">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#475569]" />
             <input
@@ -112,6 +132,27 @@ export default function ProblemList() {
               </button>
             ))}
           </div>
+          {/* Tag filter */}
+          <select
+            value={tagFilter}
+            onChange={e => setTagFilter(e.target.value)}
+            className="bg-[#0d1424] border border-[#1e2d45] rounded-lg px-3 py-2 text-xs font-semibold text-[#94a3b8] focus:outline-none focus:border-blue-500/60 transition-all cursor-pointer"
+          >
+            <option value="">All Tags</option>
+            {allTags.map(tag => (
+              <option key={tag} value={tag}>{tag}</option>
+            ))}
+          </select>
+          {/* Clear tag filter badge */}
+          {tagFilter && (
+            <button
+              onClick={() => setTagFilter('')}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1e2d45] border border-[#2a3f5f] rounded-lg text-xs font-semibold text-[#94a3b8] hover:text-white transition-all"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+              {tagFilter} ×
+            </button>
+          )}
         </div>
 
         {/* ── Problem table ── */}

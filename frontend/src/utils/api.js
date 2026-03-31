@@ -1,7 +1,11 @@
 const API_BASE = 'http://localhost:3000/api';
 
-export const getProblems = async () => {
-  const res = await fetch(`${API_BASE}/problems`);
+export const getProblems = async ({ difficulty, tag } = {}) => {
+  const params = new URLSearchParams();
+  if (difficulty && difficulty !== 'All') params.set('difficulty', difficulty);
+  if (tag) params.set('tag', tag);
+  const query = params.toString() ? `?${params.toString()}` : '';
+  const res = await fetch(`${API_BASE}/problems${query}`);
   if (!res.ok) throw new Error('Failed to fetch problems');
   return res.json();
 };
