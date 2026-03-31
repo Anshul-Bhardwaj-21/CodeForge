@@ -80,8 +80,7 @@ export const submitCode = async (problemId, language, code) => {
   return res.json();
 };
 
-export const getProgress = async () => {
-  const res = await fetch(`${API_BASE}/progress`);
+export const getProgress = async () => {  const res = await fetch(`${API_BASE}/progress`);
   if (!res.ok) throw new Error('Failed to fetch progress');
   return res.json();
 };
@@ -100,5 +99,30 @@ export const recordSubmission = async (payload) => {
     body: JSON.stringify({ problemId, language, verdict, timeTaken })
   });
   if (!res.ok) throw new Error('Failed to record submission');
+  return res.json();
+};
+
+export const getSubmissions = async () => {
+  const res = await fetch(`${API_BASE}/submissions`);
+  if (!res.ok) throw new Error('Failed to fetch submissions');
+  return res.json();
+};
+
+export const getSubmission = async (id) => {
+  const res = await fetch(`${API_BASE}/submissions/${id}`);
+  if (!res.ok) throw new Error('Failed to fetch submission');
+  return res.json();
+};
+
+export const replaySubmission = async (submissionId) => {
+  const res = await fetch(`${API_BASE}/submissions/replay`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ submissionId }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error || `Replay failed: ${res.status}`);
+  }
   return res.json();
 };
