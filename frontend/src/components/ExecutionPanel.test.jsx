@@ -1,8 +1,10 @@
 // Feature: premium-dark-theme-ui
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import * as fc from 'fast-check';
 import ExecutionPanel from './ExecutionPanel';
+
+import { runCode, submitCode } from '../utils/api';
 
 vi.mock('../utils/api', () => ({
   runCode: vi.fn(),
@@ -69,25 +71,30 @@ describe('Property 4: button hover variants present', () => {
   });
 });
 
-// Property 5: all controls disabled during loading
+// Property 5: all controls disabled during loading (triggered by clicking Run)
 describe('Property 5: all interactive controls disabled during loading', () => {
-  it('Run and Submit buttons are disabled and have disabled:opacity-50 when isLoading=true', () => {
-    fc.assert(
-      fc.property(fc.constant(true), (isLoading) => {
-        const { container, unmount } = render(
-          <ExecutionPanel {...defaultProps} isLoading={isLoading} />
-        );
-        const buttons = container.querySelectorAll('button');
-        const runBtn = Array.from(buttons).find((b) => b.textContent.includes('Run'));
-        const submitBtn = Array.from(buttons).find((b) => b.textContent.includes('Submit'));
-        expect(runBtn).toBeDisabled();
-        expect(submitBtn).toBeDisabled();
-        expect(runBtn.className).toContain('disabled:opacity-50');
-        expect(submitBtn.className).toContain('disabled:opacity-50');
-        unmount();
-      }),
-      { numRuns: 100 }
-    );
+  it('Run and Submit buttons are disabled and have disabled:opacity-50 while a run is in progress', async () => {
+    // Make runCode hang so we can inspect the loading state
+    runCode.mockImplementation(() => new Promise(() => {}));
+
+    const { container } = render(<ExecutionPanel {...defaultProps} />);
+    const buttons = container.querySelectorAll('button');
+    const runBtn = Array.from(buttons).find((b) => b.textContent.includes('Run'));
+    const submitBtn = Array.from(buttons).find((b) => b.textContent.includes('Submit'));
+
+    // Before clicking — buttons should be enabled
+    expect(runBtn).not.toBeDisabled();
+
+    fireEvent.click(runBtn);
+
+    // After clicking — both buttons should be disabled
+    await waitFor(() => {
+      expect(runBtn).toBeDisabled();
+      expect(submitBtn).toBeDisabled();
+    });
+
+    expect(runBtn.className).toContain('disabled:opacity-50');
+    expect(submitBtn.className).toContain('disabled:opacity-50');
   });
 });
 
@@ -134,11 +141,16 @@ describe('Property 6: status indicator correctness', () => {
 
 // Unit tests: loading spinner+message, fade-in on result, copy button toggle
 describe('ExecutionPanel unit tests', () => {
-  it('shows animate-spin spinner and "Executing on server..." when isLoading=true', () => {
-    const { container } = render(<ExecutionPanel {...defaultProps} isLoading={true} />);
-    const spinner = container.querySelector('.animate-spin');
-    expect(spinner).toBeInTheDocument();
-    expect(screen.getByText('Executing on server...')).toBeInTheDocument();
+  it('shows animate-spin spinner and "Executing on server..." when Run is clicked', async () => {
+    runCode.mockImplementation(() => new Promise(() => {}));
+    const { container } = render(<ExecutionPanel {...defaultProps} />);
+    const buttons = container.querySelectorAll('button');
+    const runBtn = Array.from(buttons).find((b) => b.textContent.includes('Run'));
+    fireEvent.click(runBtn);
+    await waitFor(() => {
+      expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+      expect(screen.getByText('Executing on server...')).toBeInTheDocument();
+    });
   });
 
   it('result container has animate-in and fade-in classes when outputData is present', () => {

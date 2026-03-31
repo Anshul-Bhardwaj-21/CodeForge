@@ -28,7 +28,16 @@ export const submitCode = async (problemId, language, code) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ problemId, language, code })
   });
-  if (!res.ok) throw new Error('Submission failed');
+  if (!res.ok) {
+    // Try to get the actual error message from the server
+    try {
+      const body = await res.json();
+      throw new Error(body.error || `Server error: ${res.status}`);
+    } catch (e) {
+      if (e.message !== `Server error: ${res.status}`) throw e;
+      throw new Error(`Server error: ${res.status}`);
+    }
+  }
   return res.json();
 };
 

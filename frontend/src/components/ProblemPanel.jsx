@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import { CheckCircle2, Clock } from 'lucide-react';
 
 const difficultyColors = {
   Easy: 'text-[#22c55e] bg-[#22c55e]/10 border border-[#22c55e]/20',
@@ -7,7 +8,8 @@ const difficultyColors = {
   Hard: 'text-[#ef4444] bg-[#ef4444]/10 border border-[#ef4444]/20'
 };
 
-export default function ProblemPanel({ problem }) {
+// solvedStatus: 'solved' | 'attempted' | 'unseen' | null
+export default function ProblemPanel({ problem, solvedStatus }) {
   if (!problem) {
     return (
       <div className="flex flex-col h-full p-6 animate-pulse bg-[#111827]">
@@ -28,7 +30,19 @@ export default function ProblemPanel({ problem }) {
   return (
     <div className="flex-1 overflow-y-auto p-5 scrollbar-thin scrollbar-thumb-[#334155] bg-[#111827]">
       <div className="mb-5">
-        <h2 className="text-2xl font-bold text-white tracking-tight mb-4">{problem.id}. {problem.title}</h2>
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <h2 className="text-2xl font-bold text-white tracking-tight">{problem.id}. {problem.title}</h2>
+          {solvedStatus === 'solved' && (
+            <span className="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/30">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Solved
+            </span>
+          )}
+          {solvedStatus === 'attempted' && (
+            <span className="shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-[#eab308]/10 text-[#eab308] border border-[#eab308]/25">
+              <Clock className="w-3.5 h-3.5" /> Attempted
+            </span>
+          )}
+        </div>
         <div className="flex flex-wrap gap-2">
           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${difficultyColors[problem.difficulty] || 'text-[#9ca3af] bg-[#1f2937]'}`}>
             {problem.difficulty}

@@ -163,11 +163,12 @@ const { LANGUAGE_IDS } = require('../judge0Client');
 
 // Validates: Requirements 2.1
 describe('Property 1: Language mapping completeness', () => {
-  test('LANGUAGE_IDS contains exactly 4 entries', () => {
-    expect(Object.keys(LANGUAGE_IDS).length).toBe(4);
+  test('LANGUAGE_IDS contains exactly 5 entries', () => {
+    expect(Object.keys(LANGUAGE_IDS).length).toBe(5);
   });
 
   test('each supported language maps to the correct Judge0 ID', () => {
+    expect(LANGUAGE_IDS.c).toBe(50);
     expect(LANGUAGE_IDS.cpp).toBe(54);
     expect(LANGUAGE_IDS.python).toBe(71);
     expect(LANGUAGE_IDS.java).toBe(62);

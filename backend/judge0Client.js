@@ -1,6 +1,8 @@
 'use strict';
 
-const JUDGE0_URL = process.env.JUDGE0_URL || 'http://localhost:2358';
+// Use JUDGE0_URL env var if set (local Docker), otherwise fall back to the
+// public Judge0 CE instance which works without an API key for low-volume use.
+const JUDGE0_URL = (process.env.JUDGE0_URL || 'https://ce.judge0.com').replace(/\/$/, '');
 
 const LANGUAGE_IDS = {
   c:          50,
@@ -37,24 +39,29 @@ function normalizeResult(response) {
   const stderr         = decodeB64(response.stderr);
   const compileOutput  = decodeB64(response.compile_output);
 
+  const base = {
+    time:   response.time   ?? null,   // seconds string e.g. "0.042"
+    memory: response.memory ?? null,   // KB
+  };
+
   if (id === 3) {
-    return { output: stdout, error: '', status: 'success' };
+    return { ...base, output: stdout, error: '', status: 'success' };
   }
 
   if (id === 5) {
-    return { output: '', error: 'Time Limit Exceeded', status: 'error' };
+    return { ...base, output: '', error: 'Time Limit Exceeded', status: 'error' };
   }
 
   if (id === 8) {
-    return { output: '', error: 'Memory Limit Exceeded', status: 'error' };
+    return { ...base, output: '', error: 'Memory Limit Exceeded', status: 'error' };
   }
 
   if (id === 6) {
-    return { output: '', error: compileOutput, status: 'error' };
+    return { ...base, output: '', error: compileOutput, status: 'error' };
   }
 
-  // All other statuses (runtime errors, wrong answer, etc.)
   return {
+    ...base,
     output: stdout,
     error:  stderr || compileOutput || description,
     status: 'error',
@@ -63,11 +70,12 @@ function normalizeResult(response) {
 
 /**
  * Submit code to Judge0 and return a normalized result.
+ * Uses wait=true for local instances; falls back to polling for hosted instances.
  * @param {{ languageId: number, sourceCode: string, stdin: string }} params
  * @returns {Promise<{ output: string, error: string, status: "success"|"error" }>}
  */
 async function execute({ languageId, sourceCode, stdin }) {
-  const url = `${JUDGE0_URL}/submissions?base64_encoded=true&wait=true`;
+  const submitUrl = `${JUDGE0_URL}/submissions?base64_encoded=true&wait=true`;
 
   const body = {
     language_id:  languageId,
@@ -77,7 +85,7 @@ async function execute({ languageId, sourceCode, stdin }) {
 
   let response;
   try {
-    response = await fetch(url, {
+    response = await fetch(submitUrl, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(body),
@@ -99,7 +107,37 @@ async function execute({ languageId, sourceCode, stdin }) {
   }
 
   const json = await response.json();
-  return normalizeResult(json);
+
+  // If wait=true worked and we already have a terminal status, return immediately
+  if (json.status && json.status.id >= 3) {
+    return normalizeResult(json);
+  }
+
+  // Otherwise poll until done (public hosted instance may return token only)
+  if (!json.token) {
+    return normalizeResult(json);
+  }
+
+  const token = json.token;
+  const pollUrl = `${JUDGE0_URL}/submissions/${token}?base64_encoded=true`;
+
+  for (let attempt = 0; attempt < 20; attempt++) {
+    await new Promise(r => setTimeout(r, 800));
+    let pollRes;
+    try {
+      pollRes = await fetch(pollUrl);
+    } catch (err) {
+      throw new Error(`Judge0 poll error: ${err.message}`);
+    }
+    if (!pollRes.ok) throw new Error(`Judge0 poll status: ${pollRes.status}`);
+    const pollJson = await pollRes.json();
+    // Status IDs 1 (In Queue) and 2 (Processing) mean not done yet
+    if (pollJson.status && pollJson.status.id >= 3) {
+      return normalizeResult(pollJson);
+    }
+  }
+
+  throw new Error('Judge0 timed out waiting for result');
 }
 
 module.exports = { LANGUAGE_IDS, normalize, normalizeResult, execute };

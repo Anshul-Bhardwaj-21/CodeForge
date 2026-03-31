@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getProblems } from '../utils/api';
-import { Terminal, Search, CheckCircle2, Circle, LayoutDashboard, Code2, Filter } from 'lucide-react';
+import { getProblems, getProgress } from '../utils/api';
+import { Terminal, Search, CheckCircle2, Circle, MinusCircle, LayoutDashboard, Code2, Filter } from 'lucide-react';
 
 const DIFFICULTY_CONFIG = {
   Easy:   { text: 'text-[#22c55e]', bg: 'bg-[#22c55e]/10', border: 'border-[#22c55e]/25', dot: 'bg-[#22c55e]' },
@@ -11,11 +11,15 @@ const DIFFICULTY_CONFIG = {
 
 export default function ProblemList() {
   const [problems, setProblems] = useState([]);
+  const [progress, setProgress] = useState({});
   const [search, setSearch] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState('All');
 
   useEffect(() => {
     getProblems().then(setProblems).catch(console.error);
+    getProgress()
+      .then(data => setProgress(data.problems || {}))
+      .catch(() => {}); // non-critical
   }, []);
 
   const filtered = problems.filter(p => {
@@ -128,9 +132,15 @@ export default function ProblemList() {
                   key={problem.id}
                   className="grid grid-cols-[2rem_1fr_7rem_1fr] gap-0 px-5 py-4 items-center hover:bg-[#111827]/60 transition-colors group"
                 >
-                  {/* Status dot */}
+                  {/* Status icon */}
                   <div className="flex items-center">
-                    <Circle className="w-4 h-4 text-[#2a3f5f] group-hover:text-[#3b82f6]/40 transition-colors" />
+                    {progress[problem.id]?.status === 'solved' ? (
+                      <CheckCircle2 className="w-4 h-4 text-[#22c55e]" />
+                    ) : progress[problem.id]?.status === 'attempted' ? (
+                      <MinusCircle className="w-4 h-4 text-[#eab308]" />
+                    ) : (
+                      <Circle className="w-4 h-4 text-[#2a3f5f] group-hover:text-[#3b82f6]/40 transition-colors" />
+                    )}
                   </div>
 
                   {/* Title */}

@@ -3,16 +3,17 @@ import { useParams, Link } from 'react-router-dom';
 import ProblemPanel from '../components/ProblemPanel';
 import EditorPanel from '../components/EditorPanel';
 import ExecutionPanel from '../components/ExecutionPanel';
-import { getProblemDetails, recordSubmission } from '../utils/api';
+import { getProblemDetails, recordSubmission, getProgressForProblem } from '../utils/api';
 import { Terminal, ChevronLeft, X } from 'lucide-react';
 
 export default function Workspace() {
   const { id } = useParams();
   const [problem, setProblem] = useState(null);
+  const [solvedStatus, setSolvedStatus] = useState('unseen'); // 'solved' | 'attempted' | 'unseen'
   
   // Editor state
   const [language, setLanguage] = useState(localStorage.getItem('cf_language') || 'cpp');
-  const [code, setCode] = useState(localStorage.getItem(`cf_code_${language}_${id}`) || '');
+  const [code, setCode] = useState('');
   
   // Execution state
   const [customInput, setCustomInput] = useState('');
@@ -34,12 +35,21 @@ export default function Workspace() {
         console.error("Failed to load problem", err);
       }
     };
+    const loadProgress = async () => {
+      try {
+        const prog = await getProgressForProblem(id);
+        setSolvedStatus(prog.status || 'unseen');
+      } catch (err) {
+        // non-critical, ignore
+      }
+    };
     loadProblem();
+    loadProgress();
   }, [id]);
 
   const handleSetCode = (newCode) => {
     setCode(newCode);
-    localStorage.setItem(`cf_code_${language}_${id}`, newCode);
+    // EditorPanel handles localStorage persistence with problem-scoped key
   }
 
   const onSubmitComplete = async (result, timeTaken) => {
@@ -60,8 +70,17 @@ export default function Workspace() {
       verdict = 'wrong_answer';
     }
 
+    // If already solved and this is another accepted submission, don't count it again
+    if (solvedStatus === 'solved' && verdict === 'accepted') return;
+
     try {
       await recordSubmission({ problemId: id, language, verdict, timeTaken });
+      // Update local solved status so badge shows immediately
+      if (verdict === 'accepted') {
+        setSolvedStatus('solved');
+      } else if (solvedStatus === 'unseen') {
+        setSolvedStatus('attempted');
+      }
     } catch (err) {
       setProgressWarning('Could not save submission progress. Your result is still shown below.');
     }
@@ -106,7 +125,7 @@ export default function Workspace() {
       <main className="flex flex-1 overflow-hidden p-4 gap-4">
         {/* Left Panel: Problem Statement (30%) */}
         <div className="w-[30%] min-w-[320px] border border-[#1f2937] bg-[#111827] rounded-xl flex flex-col overflow-hidden shadow-lg">
-          <ProblemPanel problem={problem} />
+          <ProblemPanel problem={problem} solvedStatus={solvedStatus} />
         </div>
 
         {/* Center Panel: Code Editor (40%) */}
@@ -117,6 +136,7 @@ export default function Workspace() {
             code={code} 
             setCode={handleSetCode}
             problemBoilerplates={problem?.boilerplates}
+            problemId={id}
           />
         </div>
 

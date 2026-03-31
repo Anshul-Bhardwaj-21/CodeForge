@@ -1,0 +1,74 @@
+{
+  "lastUpdated": "2026-03-27T05:56:35.254Z",
+  "problems": {
+    "1": {
+      "status": "solved",
+      "solvedAt": "2026-03-27T05:37:16.302Z",
+      "languages": [
+        "c"
+      ],
+      "submissions": [
+        {
+          "submittedAt": "2026-03-27T05:37:16.302Z",
+          "language": "c",
+          "verdict": "accepted",
+          "timeTaken": 1678
+        },
+        {
+          "submittedAt": "2026-03-27T05:44:19.498Z",
+          "language": "c",
+          "verdict": "accepted",
+          "timeTaken": 1836
+        },
+        {
+          "submittedAt": "2026-03-27T05:48:45.872Z",
+          "language": "c",
+          "verdict": "accepted",
+          "timeTaken": 2141
+        },
+        {
+          "submittedAt": "2026-03-27T05:49:17.785Z",
+          "language": "c",
+          "verdict": "accepted",
+          "timeTaken": 2412
+        }
+      ]
+    },
+    "2": {
+      "status": "solved",
+      "solvedAt": "2026-03-27T05:52:29.118Z",
+      "languages": [
+        "c"
+      ],
+      "submissions": [
+        {
+          "submittedAt": "2026-03-27T05:51:32.160Z",
+          "language": "c",
+          "verdict": "wrong_answer",
+          "timeTaken": 1848
+        },
+        {
+          "submittedAt": "2026-03-27T05:52:29.118Z",
+          "language": "c",
+          "verdict": "accepted",
+          "timeTaken": 1646
+        }
+      ]
+    },
+    "3": {
+      "status": "solved",
+      "solvedAt": "2026-03-27T05:56:35.254Z",
+      "languages": [
+        "c"
+      ],
+      "submissions": [
+        {
+          "submittedAt": "2026-03-27T05:56:35.254Z",
+          "language": "c",
+          "verdict": "accepted",
+          "timeTaken": 1628
+        }
+      ]
+    }
+  }
+}

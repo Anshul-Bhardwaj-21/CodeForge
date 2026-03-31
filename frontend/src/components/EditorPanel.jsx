@@ -39,17 +39,17 @@ class Main {
 }`
 };
 
-export default function EditorPanel({ language, setLanguage, code, setCode, problemBoilerplates }) {
+export default function EditorPanel({ language, setLanguage, code, setCode, problemBoilerplates, problemId }) {
   useEffect(() => {
     localStorage.setItem('cf_language', language);
-    const savedCode = localStorage.getItem(`cf_code_${language}`);
+    const savedCode = localStorage.getItem(`cf_code_${language}_${problemId}`);
     if (savedCode !== null && savedCode !== "") {
       setCode(savedCode);
     } else {
       // Prefer problem-specific boilerplate, fall back to generic
       setCode((problemBoilerplates?.[language]) ?? boilerplates[language] ?? '');
     }
-  }, [language, setCode, problemBoilerplates]);
+  }, [language, problemId, setCode, problemBoilerplates]);
 
   const handleLanguageChange = (e) => {
     setLanguage(e.target.value);
@@ -57,7 +57,7 @@ export default function EditorPanel({ language, setLanguage, code, setCode, prob
 
   const handleEditorChange = (value) => {
     setCode(value);
-    localStorage.setItem(`cf_code_${language}`, value);
+    localStorage.setItem(`cf_code_${language}_${problemId}`, value);
   };
 
   return (
@@ -81,7 +81,7 @@ export default function EditorPanel({ language, setLanguage, code, setCode, prob
           onClick={() => {
             const bp = (problemBoilerplates?.[language]) ?? boilerplates[language] ?? '';
             setCode(bp);
-            localStorage.setItem(`cf_code_${language}`, bp);
+            localStorage.setItem(`cf_code_${language}_${problemId}`, bp);
           }}
           className="flex items-center text-xs font-medium text-[#9ca3af] hover:text-[#e5e7eb] transition-colors px-3 py-1.5 rounded bg-transparent hover:bg-[#1f2937]"
           title="Reset to boilerplate code"

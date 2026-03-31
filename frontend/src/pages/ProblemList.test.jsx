@@ -6,6 +6,7 @@ import ProblemList from './ProblemList';
 
 vi.mock('../utils/api', () => ({
   getProblems: vi.fn(),
+  getProgress: vi.fn().mockResolvedValue({ problems: {} }),
 }));
 
 import { getProblems } from '../utils/api';

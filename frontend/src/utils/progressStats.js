@@ -169,7 +169,8 @@ export function computeTopicBreakdown(progressData, problems) {
 
   for (const problem of problems ?? []) {
     const status = progressData?.problems?.[problem.id]?.status ?? 'unseen';
-    for (const tag of problem.tags ?? []) {
+    const uniqueTags = [...new Set(problem.tags ?? [])];
+    for (const tag of uniqueTags) {
       totals.set(tag, (totals.get(tag) ?? 0) + 1);
       if (status === 'solved') {
         solved.set(tag, (solved.get(tag) ?? 0) + 1);

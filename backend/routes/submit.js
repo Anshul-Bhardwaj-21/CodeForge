@@ -6,6 +6,22 @@ const fs = require('fs');
 const path = require('path');
 
 const { LANGUAGE_IDS, execute, normalize } = require('../judge0Client');
+const { estimateComplexity } = require('../complexityAnalyzer');
+
+const PROBLEMS_DIR = path.join(__dirname, '../../data/problems');
+
+function findProblem(problemId) {
+  const files = fs.readdirSync(PROBLEMS_DIR);
+  for (const file of files) {
+    if (!file.endsWith('.json')) continue;
+    try {
+      const content = JSON.parse(fs.readFileSync(path.join(PROBLEMS_DIR, file), 'utf8'));
+      // Match by string or number
+      if (String(content.id) === String(problemId)) return content;
+    } catch (_) {}
+  }
+  return null;
+}
 
 router.post('/', async (req, res) => {
   const { language, code, problemId } = req.body;
@@ -21,15 +37,14 @@ router.post('/', async (req, res) => {
   const languageId = LANGUAGE_IDS[language];
 
   let problem;
-  const problemPath = path.join(__dirname, '../../data/problems', problemId + '.json');
   try {
-    const content = fs.readFileSync(problemPath, 'utf8');
-    problem = JSON.parse(content);
+    problem = findProblem(problemId);
   } catch (err) {
-    if (err.code === 'ENOENT') {
-      return res.status(404).json({ error: 'Problem not found' });
-    }
     return res.status(500).json({ error: 'Error reading problem data' });
+  }
+
+  if (!problem) {
+    return res.status(404).json({ error: 'Problem not found' });
   }
 
   const allTestCases = [
@@ -39,6 +54,8 @@ router.post('/', async (req, res) => {
 
   let passedCounter = 0;
   const details = [];
+  const executionTimes = [];
+  const inputSizes = []; // first integer on first line of each test case input
 
   try {
     for (let i = 0; i < allTestCases.length; i++) {
@@ -58,6 +75,12 @@ router.post('/', async (req, res) => {
           }
         }
 
+        if (result.time != null) executionTimes.push(parseFloat(result.time));
+
+        // Extract input size: first integer token in the input string
+        const firstToken = parseInt((testCase.input || '').trim().split(/\s+/)[0], 10);
+        if (!isNaN(firstToken) && firstToken > 0) inputSizes.push(firstToken);
+
         details.push({
           testCaseNumber: i + 1,
           passed,
@@ -66,6 +89,8 @@ router.post('/', async (req, res) => {
           actualOutput: actualOutput || '',
           error: result.error || '',
           status: result.status,
+          time: result.time ?? null,
+          memory: result.memory ?? null,
         });
       } catch (err) {
         const msg = err.message || '';
@@ -74,9 +99,7 @@ router.post('/', async (req, res) => {
           msg.includes('unreachable') ||
           msg.toLowerCase().includes('network error');
 
-        if (isConnectivity) {
-          throw err; // bubble up to outer catch → 503
-        }
+        if (isConnectivity) throw err;
 
         details.push({
           testCaseNumber: i + 1,
@@ -86,14 +109,33 @@ router.post('/', async (req, res) => {
           actualOutput: '',
           error: msg,
           status: 'error',
+          time: null,
+          memory: null,
         });
       }
     }
+
+    const avgTime = executionTimes.length
+      ? executionTimes.reduce((a, b) => a + b, 0) / executionTimes.length
+      : null;
+    const maxTime = executionTimes.length ? Math.max(...executionTimes) : null;
+
+    const complexity = estimateComplexity(
+      code,
+      executionTimes,
+      inputSizes.length === executionTimes.length ? inputSizes : null
+    );
 
     return res.json({
       passed: passedCounter,
       total: allTestCases.length,
       details,
+      performance: {
+        avgTime,
+        maxTime,
+        times: executionTimes,
+        complexity,
+      },
     });
   } catch (err) {
     const msg = (err.message || '').toLowerCase();
