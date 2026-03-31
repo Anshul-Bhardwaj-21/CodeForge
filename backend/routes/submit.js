@@ -4,10 +4,12 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 
 const { LANGUAGE_IDS, execute, normalize } = require('../judge0Client');
 const { estimateComplexity } = require('../complexityAnalyzer');
 const { getCached, setCached, isCacheable } = require('../cacheManager');
+const { saveSubmission } = require('./submissions');
 
 const PROBLEMS_DIR = path.join(__dirname, '../../data/problems');
 
@@ -17,7 +19,6 @@ function findProblem(problemId) {
     if (!file.endsWith('.json')) continue;
     try {
       const content = JSON.parse(fs.readFileSync(path.join(PROBLEMS_DIR, file), 'utf8'));
-      // Match by string or number
       if (String(content.id) === String(problemId)) return content;
     } catch (_) {}
   }
@@ -56,7 +57,7 @@ router.post('/', async (req, res) => {
   let passedCounter = 0;
   const details = [];
   const executionTimes = [];
-  const inputSizes = []; // first integer on first line of each test case input
+  const inputSizes = [];
 
   try {
     for (let i = 0; i < allTestCases.length; i++) {
@@ -88,7 +89,6 @@ router.post('/', async (req, res) => {
 
         if (result.time != null) executionTimes.push(parseFloat(result.time));
 
-        // Extract input size: first integer token in the input string
         const firstToken = parseInt((testCase.input || '').trim().split(/\s+/)[0], 10);
         if (!isNaN(firstToken) && firstToken > 0) inputSizes.push(firstToken);
 
@@ -137,16 +137,27 @@ router.post('/', async (req, res) => {
       inputSizes.length === executionTimes.length ? inputSizes : null
     );
 
+    // ── Persist detailed submission record ──────────────────────────────────
+    const verdict = passedCounter === allTestCases.length ? 'accepted' : 'wrong_answer';
+    saveSubmission({
+      id: uuidv4(),
+      problemId: String(problemId),
+      problemTitle: problem.title || `Problem ${problemId}`,
+      language,
+      languageId,
+      code,
+      verdict,
+      passed: passedCounter,
+      total: allTestCases.length,
+      details,
+      timestamp: new Date().toISOString(),
+    });
+
     return res.json({
       passed: passedCounter,
       total: allTestCases.length,
       details,
-      performance: {
-        avgTime,
-        maxTime,
-        times: executionTimes,
-        complexity,
-      },
+      performance: { avgTime, maxTime, times: executionTimes, complexity },
     });
   } catch (err) {
     const msg = (err.message || '').toLowerCase();

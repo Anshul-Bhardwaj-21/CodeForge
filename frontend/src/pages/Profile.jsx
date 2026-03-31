@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Terminal, AlertCircle, LayoutDashboard, Code2,
-  Flame, Trophy, TrendingUp, Activity, Clock, Layers,
+  Flame, Trophy, TrendingUp, Activity, Clock, Layers, History,
 } from 'lucide-react';
 import { getProgress, getProblems } from '../utils/api';
 import {
@@ -351,6 +351,10 @@ export default function Profile() {
             <LayoutDashboard className="w-3.5 h-3.5 text-blue-400" />
             Profile
           </span>
+          <Link to="/submissions" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-[#64748b] hover:text-white hover:bg-[#1e2d45] transition-all">
+            <History className="w-3.5 h-3.5" />
+            History
+          </Link>
         </nav>
       </header>
 
