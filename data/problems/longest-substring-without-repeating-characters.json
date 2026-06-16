@@ -1,0 +1,43 @@
+{
+  "id": 108,
+  "title": "Longest Substring Without Repeating Characters",
+  "difficulty": "Medium",
+  "tags": [
+    "Hash Table",
+    "String",
+    "Sliding Window"
+  ],
+  "description": "Given a string `s`, find the length of the longest substring without repeating characters.",
+  "constraints": "- `0 <= s.length <= 5 * 10^4`\n- `s` consists of English letters, digits, symbols and spaces.",
+  "examples": [
+    {
+      "input": "abcabcbb",
+      "output": "3",
+      "explanation": "The answer is \"abc\", with the length of 3."
+    }
+  ],
+  "boilerplates": {
+    "c": "#include <stdio.h>\n#include <stdlib.h>\n\nint lengthOfLongestSubstring(char * s) {\n    // your code here\n}\n\nint main() {\n    char s[50005];\n    scanf(\"%[^\n]s\", s);\n    printf(\"%d\\n\", lengthOfLongestSubstring(s));\n    return 0;\n}",
+    "cpp": "#include <iostream>\n#include <string>\n\nusing namespace std;\n\nint lengthOfLongestSubstring(string s) {\n    // your code here\n}\n\nint main() {\n    string s;\n    getline(cin, s);\n    cout << lengthOfLongestSubstring(s) << endl;\n    return 0;\n}",
+    "python": "def length_of_longest_substring(s):\n    # your code here\n    pass\n\nif __name__ == \"__main__\":\n    s = input()\n    print(length_of_longest_substring(s))",
+    "java": "import java.util.*;\n\nclass Main {\n    public static int lengthOfLongestSubstring(String s) {\n        // your code here\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.hasNextLine() ? sc.nextLine() : \"\";\n        System.out.println(lengthOfLongestSubstring(s));\n    }\n}"
+  },
+  "test_cases": {
+    "sample_test_cases": [
+      {
+        "input": "abcabcbb",
+        "output": "3"
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "input": "bbbbb",
+        "output": "1"
+      },
+      {
+        "input": "pwwkew",
+        "output": "3"
+      }
+    ]
+  }
+}

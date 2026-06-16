@@ -1,0 +1,42 @@
+{
+  "id": 111,
+  "title": "First Missing Positive",
+  "difficulty": "Hard",
+  "tags": [
+    "Array",
+    "Hash Table"
+  ],
+  "description": "Given an unsorted integer array `nums`, return the smallest missing positive integer.\n\nYou must implement an algorithm that runs in `O(n)` time and uses constant extra space.",
+  "constraints": "- `1 <= nums.length <= 10^5`\n- `-2^31 <= nums[i] <= 2^31 - 1`",
+  "examples": [
+    {
+      "input": "3\n1 2 0",
+      "output": "3",
+      "explanation": "The numbers in the range [1,2] are all in the array."
+    }
+  ],
+  "boilerplates": {
+    "c": "#include <stdio.h>\n#include <stdlib.h>\n\nint firstMissingPositive(int* nums, int numsSize) {\n    // your code here\n}\n\nint main() {\n    int n;\n    scanf(\"%d\", &n);\n    int nums[n];\n    for(int i=0; i<n; i++) scanf(\"%d\", &nums[i]);\n    printf(\"%d\\n\", firstMissingPositive(nums, n));\n    return 0;\n}",
+    "cpp": "#include <iostream>\n#include <vector>\n\nusing namespace std;\n\nint firstMissingPositive(vector<int>& nums) {\n    // your code here\n}\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> nums(n);\n    for(int i=0; i<n; i++) cin >> nums[i];\n    cout << firstMissingPositive(nums) << endl;\n    return 0;\n}",
+    "python": "def first_missing_positive(nums):\n    # your code here\n    pass\n\nif __name__ == \"__main__\":\n    n = int(input())\n    nums = list(map(int, input().split()))\n    print(first_missing_positive(nums))",
+    "java": "import java.util.*;\n\nclass Main {\n    public static int firstMissingPositive(int[] nums) {\n        // your code here\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        System.out.println(firstMissingPositive(nums));\n    }\n}"
+  },
+  "test_cases": {
+    "sample_test_cases": [
+      {
+        "input": "3\n1 2 0",
+        "output": "3"
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "input": "4\n3 4 -1 1",
+        "output": "2"
+      },
+      {
+        "input": "5\n7 8 9 11 12",
+        "output": "1"
+      }
+    ]
+  }
+}

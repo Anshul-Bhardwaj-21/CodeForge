@@ -1,0 +1,120 @@
+{
+  "submissions": [
+    {
+      "id": "5600f7d6-db46-446c-b0a7-26f176f69564",
+      "problemId": "101",
+      "problemTitle": "Two Sum",
+      "language": "c",
+      "languageId": 50,
+      "code": "#include <stdio.h>\n\nint* twoSum(int* nums, int numsSize, int target, int* returnSize) {\n    // your code here\n    *returnSize = 2;\n    int* result = (int*)malloc(2 * sizeof(int));\n    return result;\n}\n\nint main() {\n    int n, target;\n    scanf(\"%d\", &n);\n    int nums[n];\n    for (int i = 0; i < n; i++) scanf(\"%d\", &nums[i]);\n    scanf(\"%d\", &target);\n    int returnSize;\n    int* ans = twoSum(nums, n, target, &returnSize);\n    printf(\"%d %d\\n\", ans[0], ans[1]);\n    return 0;\n}",
+      "verdict": "wrong_answer",
+      "passed": 0,
+      "total": 4,
+      "details": [
+        {
+          "testCaseNumber": 1,
+          "passed": false,
+          "input": "4\n2 7 11 15\n9",
+          "expectedOutput": "0 1",
+          "actualOutput": "0 0\n",
+          "error": "",
+          "status": "success",
+          "time": "0.002",
+          "memory": 1272
+        },
+        {
+          "testCaseNumber": 2,
+          "passed": false,
+          "input": "3\n3 2 4\n6",
+          "expectedOutput": "1 2",
+          "actualOutput": "0 0\n",
+          "error": "",
+          "status": "success",
+          "time": "0.002",
+          "memory": 1112
+        },
+        {
+          "testCaseNumber": 3,
+          "passed": false,
+          "input": "2\n3 3\n6",
+          "expectedOutput": "0 1",
+          "actualOutput": "0 0\n",
+          "error": "",
+          "status": "success",
+          "time": "0.002",
+          "memory": 884
+        },
+        {
+          "testCaseNumber": 4,
+          "passed": false,
+          "input": "5\n-1 -2 -3 -4 -5\n-8",
+          "expectedOutput": "2 4",
+          "actualOutput": "0 0\n",
+          "error": "",
+          "status": "success",
+          "time": "0.002",
+          "memory": 884
+        }
+      ],
+      "timestamp": "2026-06-11T03:32:36.538Z"
+    },
+    {
+      "id": "060e4555-c8ad-423c-a8fe-ebdcfecaa51a",
+      "problemId": "4",
+      "problemTitle": "Sum of Array",
+      "language": "c",
+      "languageId": 50,
+      "code": "#include <stdio.h>\n\nint main() {\n    int n;\n    scanf(\"%d\", &n);\n    long long sum = 0;\n    for (int i = 0; i < n; i++) {\n        int x; scanf(\"%d\", &x);\n        sum += x;\n    }\n    printf(\"%lld\\n\", sum);\n    return 0;\n}",
+      "verdict": "accepted",
+      "passed": 4,
+      "total": 4,
+      "details": [
+        {
+          "testCaseNumber": 1,
+          "passed": true,
+          "input": "5\n1 2 3 4 5",
+          "expectedOutput": "15",
+          "actualOutput": "15\n",
+          "error": "",
+          "status": "success",
+          "time": "0.002",
+          "memory": 1020
+        },
+        {
+          "testCaseNumber": 2,
+          "passed": true,
+          "input": "3\n10 20 30",
+          "expectedOutput": "60",
+          "actualOutput": "60\n",
+          "error": "",
+          "status": "success",
+          "time": "0.002",
+          "memory": 1072
+        },
+        {
+          "testCaseNumber": 3,
+          "passed": true,
+          "input": "1\n0",
+          "expectedOutput": "0",
+          "actualOutput": "0\n",
+          "error": "",
+          "status": "success",
+          "time": "0.002",
+          "memory": 944
+        },
+        {
+          "testCaseNumber": 4,
+          "passed": true,
+          "input": "4\n-1 -2 3 4",
+          "expectedOutput": "4",
+          "actualOutput": "4\n",
+          "error": "",
+          "status": "success",
+          "time": "0.002",
+          "memory": 1028
+        }
+      ],
+      "timestamp": "2026-06-11T03:29:07.495Z"
+    }
+  ]
+}

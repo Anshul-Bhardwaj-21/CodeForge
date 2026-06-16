@@ -1,0 +1,41 @@
+{
+  "id": 105,
+  "title": "Number of Islands",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "Depth-First Search",
+    "Breadth-First Search",
+    "Union Find",
+    "Matrix"
+  ],
+  "description": "Given an `m x n` 2D binary grid `grid` which represents a map of '1's (land) and '0's (water), return the number of islands.\n\nAn island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.",
+  "constraints": "- `m == grid.length`\n- `n == grid[i].length`\n- `1 <= m, n <= 300`\n- `grid[i][j]` is '0' or '1'.",
+  "examples": [
+    {
+      "input": "4 5\n1 1 1 1 0\n1 1 0 1 0\n1 1 0 0 0\n0 0 0 0 0",
+      "output": "1",
+      "explanation": "There is only one connected island."
+    }
+  ],
+  "boilerplates": {
+    "c": "#include <stdio.h>\n#include <stdlib.h>\n\nint numIslands(char** grid, int gridSize, int* gridColSize) {\n    // your code here\n}\n\nint main() {\n    int m, n;\n    scanf(\"%d %d\", &m, &n);\n    char** grid = (char**)malloc(m * sizeof(char*));\n    int* colSizes = (int*)malloc(m * sizeof(int));\n    for(int i=0; i<m; i++) {\n        grid[i] = (char*)malloc(n * sizeof(char));\n        colSizes[i] = n;\n        for(int j=0; j<n; j++) {\n            scanf(\" %c\", &grid[i][j]);\n        }\n    }\n    printf(\"%d\\n\", numIslands(grid, m, colSizes));\n    return 0;\n}",
+    "cpp": "#include <iostream>\n#include <vector>\n\nusing namespace std;\n\nint numIslands(vector<vector<char>>& grid) {\n    // your code here\n}\n\nint main() {\n    int m, n;\n    cin >> m >> n;\n    vector<vector<char>> grid(m, vector<char>(n));\n    for(int i=0; i<m; i++) {\n        for(int j=0; j<n; j++) cin >> grid[i][j];\n    }\n    cout << numIslands(grid) << endl;\n    return 0;\n}",
+    "python": "def num_islands(grid):\n    # your code here\n    pass\n\nif __name__ == \"__main__\":\n    m, n = map(int, input().split())\n    grid = []\n    for _ in range(m):\n        grid.append(input().split())\n    print(num_islands(grid))",
+    "java": "import java.util.*;\n\nclass Main {\n    public static int numIslands(char[][] grid) {\n        // your code here\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int m = sc.nextInt();\n        int n = sc.nextInt();\n        char[][] grid = new char[m][n];\n        for(int i=0; i<m; i++) {\n            for(int j=0; j<n; j++) grid[i][j] = sc.next().charAt(0);\n        }\n        System.out.println(numIslands(grid));\n    }\n}"
+  },
+  "test_cases": {
+    "sample_test_cases": [
+      {
+        "input": "4 5\n1 1 1 1 0\n1 1 0 1 0\n1 1 0 0 0\n0 0 0 0 0",
+        "output": "1"
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "input": "4 5\n1 1 0 0 0\n1 1 0 0 0\n0 0 1 0 0\n0 0 0 1 1",
+        "output": "3"
+      }
+    ]
+  }
+}

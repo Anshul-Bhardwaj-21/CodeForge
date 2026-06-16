@@ -1,0 +1,51 @@
+{
+  "id": 103,
+  "title": "Valid Parentheses",
+  "difficulty": "Easy",
+  "tags": [
+    "Stack",
+    "String"
+  ],
+  "description": "Given a string `s` containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.\n\nAn input string is valid if:\n1. Open brackets must be closed by the same type of brackets.\n2. Open brackets must be closed in the correct order.\n3. Every close bracket has a corresponding open bracket of the same type.",
+  "constraints": "- `1 <= s.length <= 10^4`\n- `s` consists of parentheses only '()[]{}'.",
+  "examples": [
+    {
+      "input": "()[]{}",
+      "output": "true",
+      "explanation": "All brackets are properly closed."
+    },
+    {
+      "input": "(]",
+      "output": "false",
+      "explanation": "The bracket ( is closed by ]."
+    }
+  ],
+  "boilerplates": {
+    "c": "#include <stdio.h>\n#include <stdlib.h>\n#include <stdbool.h>\n\nbool isValid(char * s) {\n    // your code here\n}\n\nint main() {\n    char s[10005];\n    scanf(\"%s\", s);\n    bool ans = isValid(s);\n    printf(\"%s\\n\", ans ? \"true\" : \"false\");\n    return 0;\n}",
+    "cpp": "#include <iostream>\n#include <string>\n\nusing namespace std;\n\nbool isValid(string s) {\n    // your code here\n}\n\nint main() {\n    string s;\n    cin >> s;\n    bool ans = isValid(s);\n    cout << (ans ? \"true\" : \"false\") << endl;\n    return 0;\n}",
+    "python": "def is_valid(s):\n    # your code here\n    pass\n\nif __name__ == \"__main__\":\n    s = input().strip()\n    ans = is_valid(s)\n    print(\"true\" if ans else \"false\")",
+    "java": "import java.util.*;\n\nclass Main {\n    public static boolean isValid(String s) {\n        // your code here\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.next();\n        boolean ans = isValid(s);\n        System.out.println(ans ? \"true\" : \"false\");\n    }\n}"
+  },
+  "test_cases": {
+    "sample_test_cases": [
+      {
+        "input": "()[]{}",
+        "output": "true"
+      },
+      {
+        "input": "(]",
+        "output": "false"
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "input": "([)]",
+        "output": "false"
+      },
+      {
+        "input": "{[]}",
+        "output": "true"
+      }
+    ]
+  }
+}

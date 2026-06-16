@@ -1,0 +1,43 @@
+{
+  "id": 110,
+  "title": "Coin Change",
+  "difficulty": "Medium",
+  "tags": [
+    "Array",
+    "Dynamic Programming",
+    "Breadth-First Search"
+  ],
+  "description": "You are given an integer array `coins` representing coins of different denominations and an integer `amount` representing a total amount of money.\n\nReturn the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return `-1`.\n\nYou may assume that you have an infinite number of each kind of coin.",
+  "constraints": "- `1 <= coins.length <= 12`\n- `1 <= coins[i] <= 2^31 - 1`\n- `0 <= amount <= 10^4`",
+  "examples": [
+    {
+      "input": "3\n1 2 5\n11",
+      "output": "3",
+      "explanation": "11 = 5 + 5 + 1"
+    }
+  ],
+  "boilerplates": {
+    "c": "#include <stdio.h>\n#include <stdlib.h>\n\nint coinChange(int* coins, int coinsSize, int amount) {\n    // your code here\n}\n\nint main() {\n    int n;\n    scanf(\"%d\", &n);\n    int coins[n];\n    for(int i=0; i<n; i++) scanf(\"%d\", &coins[i]);\n    int amount;\n    scanf(\"%d\", &amount);\n    printf(\"%d\\n\", coinChange(coins, n, amount));\n    return 0;\n}",
+    "cpp": "#include <iostream>\n#include <vector>\n\nusing namespace std;\n\nint coinChange(vector<int>& coins, int amount) {\n    // your code here\n}\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> coins(n);\n    for(int i=0; i<n; i++) cin >> coins[i];\n    int amount;\n    cin >> amount;\n    cout << coinChange(coins, amount) << endl;\n    return 0;\n}",
+    "python": "def coin_change(coins, amount):\n    # your code here\n    pass\n\nif __name__ == \"__main__\":\n    n = int(input())\n    coins = list(map(int, input().split()))\n    amount = int(input())\n    print(coin_change(coins, amount))",
+    "java": "import java.util.*;\n\nclass Main {\n    public static int coinChange(int[] coins, int amount) {\n        // your code here\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] coins = new int[n];\n        for(int i=0; i<n; i++) coins[i] = sc.nextInt();\n        int amount = sc.nextInt();\n        System.out.println(coinChange(coins, amount));\n    }\n}"
+  },
+  "test_cases": {
+    "sample_test_cases": [
+      {
+        "input": "3\n1 2 5\n11",
+        "output": "3"
+      }
+    ],
+    "hidden_test_cases": [
+      {
+        "input": "1\n2\n3",
+        "output": "-1"
+      },
+      {
+        "input": "1\n1\n0",
+        "output": "0"
+      }
+    ]
+  }
+}
